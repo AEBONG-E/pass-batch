@@ -1,4 +1,4 @@
-package com.fastcampus.pass.runner;
+package com.fastcampus.pass.batch.runner;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
