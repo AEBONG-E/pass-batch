@@ -48,4 +48,13 @@ public class Pass {
         this.endedAt = endedAt;
         this.expiredAt = expiredAt;
     }
+
+    /**
+     * 이용권 만료에 따른 Pass 의 상태변경 및 만료일자 기록 메소드
+     */
+    public void expirePass() {
+        this.status = PassStatus.EXPIRED;
+        this.expiredAt = LocalDateTime.now();
+    }
+
 }
