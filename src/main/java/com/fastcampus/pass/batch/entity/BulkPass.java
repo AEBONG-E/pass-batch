@@ -42,4 +42,8 @@ public class BulkPass extends BaseEntity {
         this.endedAt = endedAt;
     }
 
+    public void updateStatusByBatch() {
+        this.status = BulkPassStatus.COMPLETED;
+    }
+
 }
