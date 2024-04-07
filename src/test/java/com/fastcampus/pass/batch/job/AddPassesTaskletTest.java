@@ -88,7 +88,7 @@ public class AddPassesTaskletTest {
         verify(passRepository, times(1)).saveAll(passListCaptor.capture());
 
         final List<Pass> passList = passListCaptor.getValue();
-        
+
         assertEquals(1, passList.size());
         final Pass pass = passList.get(0);
         assertEquals(packageSeq, pass.getPackageSeq());
