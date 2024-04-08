@@ -3,11 +3,13 @@ package com.fastcampus.pass.batch.job;
 import com.fastcampus.pass.batch.config.TestBatchConfig;
 import com.fastcampus.pass.batch.entity.BulkPass;
 import com.fastcampus.pass.batch.entity.UserGroupMapping;
+import com.fastcampus.pass.batch.entity.enums.BulkPassStatus;
 import com.fastcampus.pass.batch.repository.BulkPassRepository;
 import com.fastcampus.pass.batch.repository.UserGroupMappingRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.test.JobLauncherTestUtils;
@@ -58,13 +60,20 @@ public class AddPassesJobConfigTest {
         final String userId = "A100" + RandomStringUtils.randomNumeric(4);
 
         BulkPass bulkPass = BulkPass.builder()
-
+                .packageSeq(1)
+                .userGroupId(userGroupId)
+                .status(BulkPassStatus.READY)
+                .startedAt(now)
+                .endedAt(now.plusDays(60))
                 .build();
 
         bulkPassRepository.save(bulkPass);
 
         UserGroupMapping userGroupMapping = UserGroupMapping.builder()
-
+                .userGroupId(userGroupId)
+                .userId(userId)
+                .userGroupName("그룹")
+                .description("그룹 설명")
                 .build();
 
         userGroupMappingRepository.save(userGroupMapping);
