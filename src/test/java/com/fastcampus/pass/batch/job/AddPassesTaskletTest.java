@@ -20,6 +20,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,12 +46,11 @@ public class AddPassesTaskletTest {
     @Mock
     private UserGroupMappingRepository userGroupMappingRepository;
 
-    // @InjectMocks 클래스의 인스턴스를 생성하고 @Mock으로 생성된 객체를 주입합니다.
     @InjectMocks
     private AddPassesTasklet addPassesTasklet;
 
     @Test
-    public void test_execute() {
+    public void test_execute() throws Exception {
         // given
         final String userGroupId = "GROUP";
         final String userId = "A1000000";
@@ -60,26 +60,35 @@ public class AddPassesTaskletTest {
         final LocalDateTime now = LocalDateTime.now();
 
         final BulkPass bulkPass = BulkPass.builder()
+                .packageSeq(packageSeq)
+                .userGroupId(userGroupId)
+                .status(BulkPassStatus.READY)
+                .count(count)
+                .startedAt(now)
+                .endedAt(now.plusDays(60))
                 .build();
 
         final UserGroupMapping userGroupMapping = UserGroupMapping.builder()
+                .userGroupId(userGroupId)
+                .userId(userId)
                 .build();
 
         // when
-        when(bulkPassRepository.findByStatusAndStartedAtGreaterThan(eq(BulkPassStatus.READY), any())).thenReturn(List.of(bulkPassEntity));
+        when(bulkPassRepository.findByStatusAndStartedAtGreaterThan(eq(BulkPassStatus.READY), any())).thenReturn(List.of(bulkPass));
         when(userGroupMappingRepository.findByUserGroupId(eq("GROUP"))).thenReturn(List.of(userGroupMapping));
 
         RepeatStatus repeatStatus = addPassesTasklet.execute(stepContribution, chunkContext);
 
         // then
-        // execute의 return 값인 RepeatStatus 값을 확인합니다.
+        // execute의 return 값인 RepeatStatus 값을 확인
         assertEquals(RepeatStatus.FINISHED, repeatStatus);
 
-        // 추가된 PassEntity 값을 확인합니다.
-        ArgumentCaptor<List> passEntitiesCaptor = ArgumentCaptor.forClass(List.class);
-        verify(passRepository, times(1)).saveAll(passEntitiesCaptor.capture());
-        final List<Pass> passList = passList.getValue();
+        // 추가된 Pass 값을 확인
+        ArgumentCaptor<List> passListCaptor = ArgumentCaptor.forClass(List.class);
+        verify(passRepository, times(1)).saveAll(passListCaptor.capture());
 
+        final List<Pass> passList = passListCaptor.getValue();
+        
         assertEquals(1, passList.size());
         final Pass pass = passList.get(0);
         assertEquals(packageSeq, pass.getPackageSeq());
