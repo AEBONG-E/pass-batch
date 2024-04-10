@@ -46,6 +46,7 @@ public class AddPassesTaskletTest {
     @Mock
     private UserGroupMappingRepository userGroupMappingRepository;
 
+    // @InjectMocks 클래스의 인스턴스를 생성하고 @Mock으로 생성된 객체를 주입합니다.
     @InjectMocks
     private AddPassesTasklet addPassesTasklet;
 
