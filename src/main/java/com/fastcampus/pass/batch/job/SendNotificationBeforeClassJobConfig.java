@@ -16,8 +16,11 @@ import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+import org.springframework.batch.item.support.SynchronizedItemStreamReader;
+import org.springframework.batch.item.support.builder.SynchronizedItemStreamReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDateTime;
@@ -32,7 +35,10 @@ public class SendNotificationBeforeClassJobConfig {
     private final EntityManagerFactory entityManagerFactory;
     private final SendNotificationItemWriter sendNotificationItemWriter;
 
-    public SendNotificationBeforeClassJobConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, EntityManagerFactory entityManagerFactory, SendNotificationItemWriter sendNotificationItemWriter) {
+    public SendNotificationBeforeClassJobConfig(JobBuilderFactory jobBuilderFactory,
+                                                StepBuilderFactory stepBuilderFactory,
+                                                EntityManagerFactory entityManagerFactory,
+                                                SendNotificationItemWriter sendNotificationItemWriter) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.entityManagerFactory = entityManagerFactory;
@@ -43,8 +49,11 @@ public class SendNotificationBeforeClassJobConfig {
     public Job sendNotificationBeforeClassJob() {
         return this.jobBuilderFactory.get("sendNotificationBeforeClassJob")
                 .start(addNotificationStep())
+                .next(sendNotificationStep())
                 .build();
     }
+
+    /* ==========================================  Step 1 시작  =============================================== */
 
     @Bean
     public Step addNotificationStep() {
@@ -69,14 +78,19 @@ public class SendNotificationBeforeClassJobConfig {
                 // pageSize: 한 번에 조회할 row 수
                 .pageSize(CHUNK_SIZE)
                 // 상태(status)가 준비중이며, 시작일시(startedAt)이 10분 후 시작하는 예약이 알람 대상이 됩니다.
-                .queryString("select b from BookingEntity b join fetch b.userEntity where b.status = :status and b.startedAt <= :startedAt order by b.bookingSeq")
+                .queryString(
+                        "SELECT b FROM BookingEntity b " +
+                                "JOIN FETCH b.userEntity " +
+                                "WHERE b.status = :status " +
+                                "AND b.startedAt <= :startedAt ORDER BY b.bookingSeq"
+                )
                 .parameterValues(Map.of("status", BookingStatus.READY, "startedAt", LocalDateTime.now().plusMinutes(10)))
                 .build();
     }
 
     @Bean
     public ItemProcessor<Booking, Notification> addNotificationItemProcessor() {
-        return booking -> NotificationModelMapper.INSTANCE.toNotificationEntity(booking, NotificationEvent.BEFORE_CLASS);
+        return booking -> NotificationModelMapper.INSTANCE.toNotification(booking, NotificationEvent.BEFORE_CLASS);
     }
 
     @Bean
@@ -86,24 +100,36 @@ public class SendNotificationBeforeClassJobConfig {
                 .build();
     }
 
+    /* ==========================================  Step 1 종료  =============================================== */
+
+
+    /* ==========================================  Step 2 시작  =============================================== */
+
     @Bean
     public Step sendNotificationStep() {
         return this.stepBuilderFactory.get("sendNotificationStep")
-                .<Booking, Notification>chunk(CHUNK_SIZE)
-                .reader(addNotificationItemReader())
+                .<Notification, Notification>chunk(CHUNK_SIZE)
+                .reader(sendNotificationItemReader())
                 .writer(sendNotificationItemWriter)
+                .taskExecutor(new SimpleAsyncTaskExecutor())
                 .build();
     }
 
     @Bean
-    public JpaCursorItemReader<Notification> sendNotificationItemReader() {
-        return new JpaCursorItemReaderBuilder<Notification>()
-                .name("addNotificationItemReader")
+    public SynchronizedItemStreamReader<Notification> sendNotificationItemReader() {
+        // 이벤트(event)가 수업 전이며, 발송 여부(sent)가 미발송인 알람이 조회 대상이 된다.
+        JpaCursorItemReader<Notification> itemReader = new JpaCursorItemReaderBuilder<Notification>()
+                .name("sendNotificationItemReader")
                 .entityManagerFactory(entityManagerFactory)
-                // 상태(status)가 준비중이며, 시작일시(startedAt)이 10분 후 시작하는 예약이 알람 대상이 됩니다.
-                .queryString("select n from NotificationEntity n where n.event = :event and n.sent = :sent order by n.notificationSeq")
-                .parameterValues(Map.of("status", BookingStatus.READY, "startedAt", LocalDateTime.now().plusMinutes(10)))
+                .queryString("SELECT n FROM Notification n WHERE n.event = :event AND n.sent = :sent")
+                .parameterValues(Map.of("event", NotificationEvent.BEFORE_CLASS, "sent", false))
+                .build();
+
+        return new SynchronizedItemStreamReaderBuilder<Notification>()
+                .delegate(itemReader)
                 .build();
     }
+
+    /* ==========================================  Step 2 종료  =============================================== */
 
 }
