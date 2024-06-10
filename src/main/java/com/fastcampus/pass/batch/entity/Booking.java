@@ -28,6 +28,10 @@ public class Booking extends BaseEntity {
     private LocalDateTime endedAt;
     private LocalDateTime cancelledAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    private User user;
+
     @Builder
     public Booking(Integer bookingSeq,
                    Integer passSeq,
