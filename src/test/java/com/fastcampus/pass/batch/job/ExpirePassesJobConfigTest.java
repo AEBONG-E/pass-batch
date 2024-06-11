@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 @SpringBatchTest
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 @ContextConfiguration(classes = {ExpirePassesJobConfig.class, TestBatchConfig.class})
 class ExpirePassesJobConfigTest {
 

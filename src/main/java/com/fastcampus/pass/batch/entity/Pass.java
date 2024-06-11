@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @ToString
 @NoArgsConstructor
-@Table(name = "mapper")
+@Table(name = "pass")
 @Entity
 public class Pass {
 

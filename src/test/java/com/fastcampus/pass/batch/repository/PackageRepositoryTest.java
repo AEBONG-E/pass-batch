@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 class PackageRepositoryTest {
 
     @Autowired private PackageRepository packageRepository;
@@ -43,6 +43,7 @@ class PackageRepositoryTest {
 
         // when
         packageRepository.save(newPackage);
+        System.out.println("newPackage = " + newPackage);
 
         // then
         assertNotNull(newPackage.getPackageSeq());
