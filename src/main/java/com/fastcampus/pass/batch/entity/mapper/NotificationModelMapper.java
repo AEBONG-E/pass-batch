@@ -4,16 +4,13 @@ import com.fastcampus.pass.batch.entity.Booking;
 import com.fastcampus.pass.batch.entity.Notification;
 import com.fastcampus.pass.batch.entity.enums.NotificationEvent;
 import com.fastcampus.pass.batch.util.LocalDateTimeUtils;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
 
 // ReportingPolicy.IGNORE: 일치하지 않는 필드를 무시한다.
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = false))
 public interface NotificationModelMapper {
 
     NotificationModelMapper INSTANCE = Mappers.getMapper(NotificationModelMapper.class);
