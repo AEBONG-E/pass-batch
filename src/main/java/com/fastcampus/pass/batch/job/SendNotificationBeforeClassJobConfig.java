@@ -67,8 +67,8 @@ public class SendNotificationBeforeClassJobConfig {
     }
 
     /**
-     * JpaPagingItemReader: JPA에서 사용하는 페이징 기법입니다.
-     * 쿼리 당 pageSize만큼 가져오며 다른 PagingItemReader와 마찬가지로 Thread-safe 합니다.
+     * JpaPagingItemReader: JPA에서 사용하는 페이징 기법으로
+     * 쿼리 당 pageSize만큼 가져오며 다른 PagingItemReader와 마찬가지로 Thread-safe 하다.
      */
     @Bean
     public JpaPagingItemReader<Booking> addNotificationItemReader() {
@@ -77,10 +77,10 @@ public class SendNotificationBeforeClassJobConfig {
                 .entityManagerFactory(entityManagerFactory)
                 // pageSize: 한 번에 조회할 row 수
                 .pageSize(CHUNK_SIZE)
-                // 상태(status)가 준비중이며, 시작일시(startedAt)이 10분 후 시작하는 예약이 알람 대상이 됩니다.
+                // 상태(status)가 준비중이며, 시작일시(startedAt)이 10분 후 시작하는 예약이 알람 대상이 된다.
                 .queryString(
-                        "SELECT b FROM BookingEntity b " +
-                                "JOIN FETCH b.userEntity " +
+                        "SELECT b FROM Booking b " +
+                                "JOIN FETCH b.user " +
                                 "WHERE b.status = :status " +
                                 "AND b.startedAt <= :startedAt ORDER BY b.bookingSeq"
                 )
