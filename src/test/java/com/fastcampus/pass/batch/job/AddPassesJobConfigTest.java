@@ -29,20 +29,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("local")
 @ContextConfiguration(classes = {AddPassesJobConfig.class, TestBatchConfig.class, AddPassesTasklet.class})
 public class AddPassesJobConfigTest {
-    @Autowired
-    private JobLauncherTestUtils jobLauncherTestUtils;
 
-    @Autowired
-    private BulkPassRepository bulkPassRepository;
-
-    @Autowired
-    private UserGroupMappingRepository userGroupMappingRepository;
+    @Autowired private JobLauncherTestUtils jobLauncherTestUtils;
+    @Autowired private BulkPassRepository bulkPassRepository;
+    @Autowired private UserGroupMappingRepository userGroupMappingRepository;
 
 
     @Test
     public void test_addPassesJob() throws Exception {
         // given
-        addBulkPassEntity();
+        addBulkPass();
 
         // when
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
@@ -54,7 +50,7 @@ public class AddPassesJobConfigTest {
 
     }
 
-    private void addBulkPassEntity() {
+    private void addBulkPass() {
         final LocalDateTime now = LocalDateTime.now();
         final String userGroupId = RandomStringUtils.randomAlphabetic(6);
         final String userId = "A100" + RandomStringUtils.randomNumeric(4);
