@@ -1,10 +1,18 @@
 spring:
-#  datasource:
-#    url: jdbc:h2:mem:mydb
-#    username: pass_local
-#    password: passlocal123
-#    driver-class-name: org.h2.Driver
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: pass_local
+    password: passlocal123
+    driver-class-name: org.h2.Driver
 
+---
+spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
     url: jdbc:mysql://localhost:13306/pass_local?zeroDateTimeBehavior=convertToNull&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: pass_local
@@ -17,4 +25,12 @@ spring:
     jdbc:
       initialize-schema: always
     job.enabled: true
+
+# @EnableJpaAuditing 어노테이션이 2개 이상 선언된 경우 아래 설정을 추가하지 않으면 애플리케이션 로딩 중 에러 발생됨
+#  main:
+#    allow-bean-definition-overriding: true
+
+kakaotalk:
+  host: https://kapi.kakao.com
+  token: YOUR_ACCESS_TOKEN
 

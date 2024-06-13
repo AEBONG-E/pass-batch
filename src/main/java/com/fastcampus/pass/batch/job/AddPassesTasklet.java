@@ -4,7 +4,7 @@ import com.fastcampus.pass.batch.entity.BulkPass;
 import com.fastcampus.pass.batch.entity.Pass;
 import com.fastcampus.pass.batch.entity.UserGroupMapping;
 import com.fastcampus.pass.batch.entity.enums.BulkPassStatus;
-import com.fastcampus.pass.batch.entity.pass.PassModelMapper;
+import com.fastcampus.pass.batch.entity.mapper.PassModelMapper;
 import com.fastcampus.pass.batch.repository.BulkPassRepository;
 import com.fastcampus.pass.batch.repository.PassRepository;
 import com.fastcampus.pass.batch.repository.UserGroupMappingRepository;
@@ -60,7 +60,7 @@ public class AddPassesTasklet implements Tasklet {
     }
 
     /**
-     * bulkPass 의 정보로 pass 데이터를 생성한다.
+     * bulkPass 의 정보로 mapper 데이터를 생성한다.
      * @param bulkPass
      * @param userIdList
      * @return int

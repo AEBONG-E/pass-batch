@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("local")
 class PackageRepositoryTest {
 
     @Autowired private PackageRepository packageRepository;
@@ -38,11 +38,12 @@ class PackageRepositoryTest {
         // given
         Package newPackage = Package.builder()
                 .packageName("바디 챌린지 PT 12주")
-                .period(84)
+                .period(120)
                 .build();
 
         // when
         packageRepository.save(newPackage);
+        System.out.println("newPackage = " + newPackage);
 
         // then
         assertNotNull(newPackage.getPackageSeq());

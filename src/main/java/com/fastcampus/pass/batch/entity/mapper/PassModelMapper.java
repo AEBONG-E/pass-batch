@@ -1,4 +1,4 @@
-package com.fastcampus.pass.batch.entity.pass;
+package com.fastcampus.pass.batch.entity.mapper;
 
 import com.fastcampus.pass.batch.entity.BulkPass;
 import com.fastcampus.pass.batch.entity.Pass;
