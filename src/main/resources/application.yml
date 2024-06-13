@@ -30,3 +30,7 @@ spring:
 #  main:
 #    allow-bean-definition-overriding: true
 
+kakaotalk:
+  host: https://kapi.kakao.com
+  token: YOUR_ACCESS_TOKEN
+

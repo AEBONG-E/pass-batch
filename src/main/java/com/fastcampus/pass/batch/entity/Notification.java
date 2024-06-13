@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 @Entity
 @Table(name = "notification")
@@ -20,4 +20,19 @@ public class Notification extends BaseEntity {
     private String text;
     private boolean sent;
     private LocalDateTime sentAt;
+
+    @Builder
+    public Notification(Integer notificationSeq,
+                        String uuid,
+                        NotificationEvent event,
+                        String text,
+                        boolean sent,
+                        LocalDateTime sentAt) {
+        this.notificationSeq = notificationSeq;
+        this.uuid = uuid;
+        this.event = event;
+        this.text = text;
+        this.sent = sent;
+        this.sentAt = sentAt;
+    }
 }
