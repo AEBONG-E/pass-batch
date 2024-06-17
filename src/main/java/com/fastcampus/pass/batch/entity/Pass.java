@@ -29,6 +29,8 @@ public class Pass {
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
     private LocalDateTime expiredAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     @Builder
     public Pass(Integer passSeq,
@@ -38,7 +40,8 @@ public class Pass {
                 Integer remainingCount,
                 LocalDateTime startedAt,
                 LocalDateTime endedAt,
-                LocalDateTime expiredAt) {
+                LocalDateTime expiredAt,
+                LocalDateTime modifiedAt) {
         this.passSeq = passSeq;
         this.packageSeq = packageSeq;
         this.userId = userId;
@@ -47,6 +50,8 @@ public class Pass {
         this.startedAt = startedAt;
         this.endedAt = endedAt;
         this.expiredAt = expiredAt;
+        this.createdAt = LocalDateTime.now();
+        this.modifiedAt = modifiedAt;
     }
 
     /**
@@ -55,6 +60,13 @@ public class Pass {
     public void expirePass() {
         this.status = PassStatus.EXPIRED;
         this.expiredAt = LocalDateTime.now();
+    }
+
+    /**
+     * 이용권 사용 시 남은 이용권 갯수 수정 하는 메소드
+     */
+    public void updateRemainingCount() {
+        this.remainingCount -= 1;
     }
 
 }

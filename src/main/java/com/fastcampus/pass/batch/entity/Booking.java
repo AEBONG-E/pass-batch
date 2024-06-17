@@ -32,6 +32,10 @@ public class Booking extends BaseEntity {
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "passSeq", insertable = false, updatable = false)
+    private Pass pass;
+
     @Builder
     public Booking(Integer bookingSeq,
                    Integer passSeq,
@@ -40,8 +44,7 @@ public class Booking extends BaseEntity {
                    boolean usedPass,
                    boolean attended,
                    LocalDateTime startedAt,
-                   LocalDateTime endedAt,
-                   LocalDateTime cancelledAt) {
+                   LocalDateTime endedAt) {
         this.bookingSeq = bookingSeq;
         this.passSeq = passSeq;
         this.userId = userId;
@@ -50,6 +53,13 @@ public class Booking extends BaseEntity {
         this.attended = attended;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
-        this.cancelledAt = cancelledAt;
     }
+
+    public void usePass() {
+        Pass bookingPass = this.getPass();
+        bookingPass.updateRemainingCount();
+        this.pass = bookingPass;
+        this.usedPass = true;
+    }
+
 }
